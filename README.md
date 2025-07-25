@@ -1,8 +1,9 @@
 # 假消息生成器
-**Fake Chatroom Message**
+**Author**: paperee  
+**Website**: HackChat&TanChat
 
 ## 项目说明
-在线制作HackChat&TanChat聊天记录
+生成假聊天记录（CSS微调
 
 ## 更新记录
 ### 2023.01.14 1.00 正式版
