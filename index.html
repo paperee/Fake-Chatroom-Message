@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html manifest="demo.appcache">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+    <meta name="Keywords" content="假消息生成器, 来自昨日的人间, 匿名聊天室, 纸片君, markdown, xchat, hackchat, ee, paperee, uwu">
+    <meta name="Description" content="假消息生成器">
+    <script src="jquery.min.js"></script>
+    <script src="remarkable.min.js"></script>
+    <script src="html2canvas.min.js"></script>
+    <script src="FileSaver.min.js"></script>
+    <script src="client.js"></script>
+    <script src="textarea.js"></script>
+    <title>假消息生成器｜PAPEREE</title>
+    <style>
+        ::-webkit-scrollbar {
+            width: 0;
+        }
+        body,#save {
+            padding: 0;
+            margin: 0;
+            overflow-y: scroll;
+            font-family: monospace;
+            background: #20201d;
+            color: #a6a28c;
+        }
+        #save {
+            padding-bottom: 20px;
+        }
+        body,input,textarea {
+            font-family: 'DejaVu Sans Mono',monospace;
+            font-size: 12px;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            -o-tab-size: 4;
+        }
+        label {
+            vertical-align: 3px;
+        }
+        input,textarea {
+            background: none;
+            border: none;
+            outline: none;
+            resize: none;
+            border-bottom: 1px solid #4e4e4e;
+            color: #a6a28c;
+            display: block;
+            margin:0 auto;
+            overflow: hidden;
+            height: 18px; 
+            line-height: 20px;
+        }
+        p {
+            margin: 6px 0px;
+        }
+        h4 {
+            font-size: 12px;
+            margin: 1em 0;
+            font-weight: bold;
+        }
+        pre {
+            display: block;
+            line-height: 1.42857143;
+            tab-size: 2;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            tab-size: 4;
+            -moz-tab-size: 4;
+            -o-tab-size: 4;
+            word-break: break-all;
+            word-wrap: break-word;
+            background-color: #4e4e4e;
+            border: 1px solid #000;
+            border-radius: 4px;
+            color: #797979;
+            margin: 0 auto;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #sidebar-content ul {
+            padding-inline-start: 20px;
+        }
+        #sidebar-content ul li {
+            list-style: disc outside none;
+        }
+        ul,ol {
+            padding: 0;
+            margin: 0;
+            display: block;
+            list-style-type: disc;
+            margin-inline-start: 0px;
+            margin-inline-end: 0px;
+            padding-inline-start: 16px;
+        }
+        ul ul,ol ol {
+            list-style: inside;
+        }
+        .hidden {
+            display: none;
+        }
+        .expand {
+                height: 100%;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        #messages {
+            padding-top: 2em;
+        }
+        .message,.refmessage {
+            padding-bottom: 1em;
+        }
+        .message .text {
+            word-wrap: break-word;
+        }
+        .nick {
+            float: left;
+            width: 16em;
+            margin-left: -17em;
+            margin-right: 1em;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            color: #6684e1;
+        }
+        .trip {
+            font-size: 10px;
+            color: #6e6b5e;
+        }
+        .text {
+            margin: 0;
+            margin-left: 1em;
+        }
+        .text p {
+            margin: 0;
+        }
+        .text a {
+            color: #e8e4cf;
+        }
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        #chatform {
+            border-top: 1px solid;
+        }
+        #chatinput {
+            width: 100%;
+            padding: 1em;
+            box-sizing: border-box;
+        }
+        #sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            padding: 1em;
+            border-left: solid 1px;
+            overflow-y: auto;
+        }
+        #sidebar-content {
+            width: 180px;
+            padding-bottom: 10%;
+        }
+        .message {
+            border-left: 1px solid rgba(125,122,104,0.5) !important;
+        }
+        .refmessage {
+            border-left: 1px solid rgba(125,122,104,1) !important;
+        }
+        .admin .nick {
+            color: #d73737;
+        }
+        .mod .nick {
+            color: #1fad83;
+        }
+        .me .nick {
+            color: #b854d4;
+        }
+        .info .nick,
+        .info .text {
+            color: #60ac39;
+        }
+        .warn .nick,
+        .warn .text {
+            color: #cfb017;
+        }
+        #footer {
+            background: #20201d;
+        }
+        #sidebar {
+            background: #292824;
+            border-color: #7d7a68;
+        }
+        #chatform {
+            border-color: #7d7a68;
+        }
+        h1,h2,h3,h4,h5,h6 {
+            margin: 3px;
+            margin-top: 0;
+            margin-left: 0;
+        }
+        blockquote {
+            padding: 3px 10px;
+            margin: 3px;
+            border-left: 5px solid #4e4e4e;
+        }
+        code {
+            padding: 2px 4px;
+            font-size: 90%;
+            color: #000000;
+            background-color: #4e4e4e;
+            border-radius: 4px;
+        }
+        hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+            border: 0;
+            border-top: 1px solid #4e4e4e;
+        }
+        mark {
+            background-color: #60ac39;
+            color: black;
+        }
+        table {
+            background-color: transparent;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+            border-spacing: 0;
+            border-collapse: collapse;
+        }
+        table>caption+thead>tr:first-child>th,table>colgroup+thead>tr:first-child>th,table>thead:first-child>tr:first-child>th,table>caption+thead>tr:first-child>td,table>colgroup+thead>tr:first-child>td,table>thead:first-child>tr:first-child>td {
+            border-top: 0;
+        }
+        table>thead>tr>th {
+            vertical-align: bottom;
+            border-bottom: 2px solid #4e4e4e;
+        }
+        table>thead>tr>th,table>tbody>tr>th,table>tfoot>tr>th,table>thead>tr>td,table>tbody>tr>td,table>tfoot>tr>td {
+            padding: 8px;
+            line-height: 1.42857143;
+            vertical-align: top;
+            border-top: 1px solid #4e4e4e;
+        }
+        th {
+            text-align: left;
+        }
+        td,th {
+            padding: 0;
+        }
+        table>tbody>tr:nth-child(odd)>td,table>tbody>tr:nth-child(odd)>th {
+            background-color: #4e4e4e;
+        }
+        table>thead>tr>th,table>tbody>tr>th,table>tfoot>tr>th,table>thead>tr>td,table>tbody>tr>td,table>tfoot>tr>td {
+            padding: 8px;
+            line-height: 1.42857143;
+            vertical-align: top;
+            border-top: 1px solid #4e4e4e;
+        }
+        td,th {
+            padding: 0;
+        }
+        img {
+            max-width: 50%;
+            max-height: 800px;
+        }
+        @media only screen and (max-width: 600px) {
+            .messages {
+                border: none;
+            }
+            #messages {
+                padding: 0.5em;
+            }
+            .message {
+                padding-bottom: 0.5em;
+            }
+            .nick {
+                margin: 12px;
+                float: none;
+                text-align: left;
+                display: inline;
+            }
+        }
+        .jebbed {
+            background: linear-gradient(to right,#6666ff,#0099ff ,#00ff00,#ff3399,#6666ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow_animation 6s ease-in-out infinite;
+            background-size: 400% 100%;
+        }
+        @keyframes rainbow_animation {
+            0%,100% {
+                    background-position: 0 0;
+            }
+            50% {
+                    background-position: 100% 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav id="sidebar">
+        <div id="content">
+            <h3>New Message</h3>
+            <p>Color</p>
+            <p><input id="color" value="44FF00"></input></p>
+            <p>Nick</p>
+            <p><input id="nick" value="ee"></input></p>
+            <p>Text</p>
+            <p><textarea id="text">我是傻逼</textarea></p>
+            <p>Trip</p>
+            <p><input id="trip" value="eYFDHl"></input></p>
+            <br>
+            <p><button id="post" type="button" onClick="post()">Post</button><button id="clear" type="button" onClick="delete_()">Clear Last</button></p>
+            <p><button id="cut" type="button" onClick="saveImage()">Save Image</button></p>
+        </div>
+    </nav>
+    <div id="save">
+        <article class="container">
+            <div id="messages" class="messages"></div>
+        </article>
+    </div>
+    <script>
+        // 文本框高度自适应
+        var text=document.getElementById("text");
+        autoTextarea(text);
+
+        // 储存消息的列表
+        var msglist=[{'color':'','nick':'*','text':'// 纸片君eeの假聊天记录生成器\n// Author: paperee\n// Website: HackChat&TanChat','trip':''},
+            {'color':'','nick':'*','text':'// MarkDown可用 LaTeX被砍\n// JS练习作 功能和界面都很粗糙\n// 保存不尽人意时 尝试调整浏览器大小','trip':''},
+            {'color':'','nick':'*','text':'// New Message\n- / Color / => 颜色\n- / Nick / => 昵称\n- / Text / => 内容\n- / Trip / => 识别码','trip':''},
+            {'color':'','nick':'*','text':'// How To Use ?\n- / Post / => 添加新的消息\n- / Clear Last / => 清空最后的消息\n- / Save Image / => 聊天内容输出为图片','trip':''},
+            {'color':'4F0','nick':'ee','text':'~~好家伙 我居然真把这个做出来了~~','trip':'eYFDHl'},
+            {'color':'4F0','nick':'ee','text':'uwu','trip':'eYFDHl'}];
+
+        // 展示消息
+        showMessage(msglist);
+
+        // 刷新消息列表
+        function pushMsg() {
+            document.getElementById("messages").innerHTML=null;
+            showMessage(msglist);
+        };
+
+        // 添加新的消息
+        function post() {
+            let color=document.getElementById("color").value;
+            let nick=document.getElementById("nick").value;
+            let text=document.getElementById("text").value;
+            let trip=document.getElementById("trip").value;
+            let msg={'color':color,'nick':nick,'text':text,'trip':trip};
+            msglist.push(msg);
+            pushMsg();
+        };
+
+        // 清空最后的消息
+        function delete_() {
+            msglist.pop();
+            pushMsg();
+        };
+
+        // 聊天内容输出为图片
+        function saveImage() {
+            document.documentElement.scrollTop=0;
+            document.body.scrollTop=0;
+
+            let uwu={
+                allowTaint: true,
+                useCORS: true,
+            }
+
+            let name=Math.random().toString(36).slice(-6);
+
+            // 允许跨域图片（但BUG还是没法显示）
+            html2canvas(document.querySelector("#save"),uwu).then(canvas => {
+
+                // 导出图片
+                let img=new Image();
+                img.src=canvas.toDataURL("image/png",1);
+
+                // 将生成的图片添加到列表
+                msglist.push({'color':'','nick':'*','text':`success\n![${name}](${img.src})`,'trip':''});
+                pushMsg();
+
+                //将canvas内容保存为文件并下载
+                canvas.toBlob(function(blob) {
+                    saveAs(blob,name);
+                });
+            });
+        };
+    </script>
+</body>
+</html>
